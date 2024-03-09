@@ -21,31 +21,19 @@ class HomePage extends HookWidget {
       {
         'id': '2',
         'title': 'Weekly Groceries',
-        'amount': 16.53,
+        'amount': 0.53,
         'date': DateTime.now(),
       },
       {
         'id': '3',
-        'title': 'Weekly Groceries',
+        'title': 'Makeup',
         'amount': 16.53,
         'date': DateTime.now(),
       },
       {
         'id': '4',
-        'title': 'Weekly Groceries',
-        'amount': 16.53,
-        'date': DateTime.now(),
-      },
-      {
-        'id': '5',
-        'title': 'Weekly Groceries',
-        'amount': 16.53,
-        'date': DateTime.now(),
-      },
-      {
-        'id': '6',
-        'title': 'Weekly Groceries',
-        'amount': 16.53,
+        'title': 'Weekly shopping',
+        'amount': 160.00,
         'date': DateTime.now(),
       },
     ]);
@@ -79,10 +67,9 @@ class HomePage extends HookWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Expense Tracker'),
-        centerTitle: true,
-        backgroundColor: const Color.fromRGBO(82, 170, 94, 1.0),
-      ),
+          title: const Text('Expense Tracker'),
+          centerTitle: true,
+          backgroundColor: const Color.fromARGB(255, 66, 191, 196)),
       body: Column(
         children: <Widget>[
           Container(
@@ -95,7 +82,7 @@ class HomePage extends HookWidget {
                   child: Text('EGP ${totalExpenses.toStringAsFixed(2)}',
                       style: TextStyle(
                           fontSize: 20,
-                          color: const Color.fromRGBO(82, 170, 94, 1.0)),
+                          color: Color.fromARGB(255, 66, 191, 196)),
                       textAlign: TextAlign.center),
                 ),
               ),
@@ -147,7 +134,7 @@ class HomePage extends HookWidget {
       floatingActionButton: Builder(
         builder: (BuildContext context) {
           return FloatingActionButton(
-            backgroundColor: const Color.fromRGBO(82, 170, 94, 1.0),
+            backgroundColor: const Color.fromARGB(255, 66, 191, 196),
             tooltip: 'Increment',
             onPressed: () async {
               TextEditingController _titleController = TextEditingController();
@@ -158,9 +145,9 @@ class HomePage extends HookWidget {
                 context: context,
                 position: RelativeRect.fromLTRB(
                   0,
+                  50,
                   0,
-                  0,
-                  MediaQuery.of(context).size.height - 100,
+                  50,
                 ),
                 items: [
                   PopupMenuItem(
