@@ -1,116 +1,71 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:table_calendar/table_calendar.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key, required this.title, required this.username});
+class HomePage extends HookWidget {
+  const HomePage({Key? key, required this.title, required this.username})
+      : super(key: key);
 
   final String title;
   final String username;
 
   @override
-  State<HomePage> createState() => HomePageState();
-}
-
-class HomePageState extends State<HomePage> {
-  List<Map<String, dynamic>> expenses = [
-    {
-      'id': '1',
-      'title': 'New Shoes',
-      'amount': 69.99,
-      'date': DateTime.now(),
-    },
-    {
-      'id': '2',
-      'title': 'Weekly Groceries',
-      'amount': 16.53,
-      'date': DateTime.now(),
-    },
-    {
-      'id': '3',
-      'title': 'New Shoes',
-      'amount': 69.99,
-      'date': DateTime.now(),
-    },
-    {
-      'id': '4',
-      'title': 'Weekly Groceries',
-      'amount': 16.53,
-      'date': DateTime.now(),
-    },
-    {
-      'id': '5',
-      'title': 'New Shoes',
-      'amount': 69.99,
-      'date': DateTime.now(),
-    },
-    {
-      'id': '6',
-      'title': 'Weekly Groceries',
-      'amount': 16.53,
-      'date': DateTime.now(),
-    },
-    {
-      'id': '7',
-      'title': 'New Shoes',
-      'amount': 69.99,
-      'date': DateTime.now(),
-    },
-    {
-      'id': '8',
-      'title': 'Weekly Groceries',
-      'amount': 16.53,
-      'date': DateTime.now(),
-    },
-    {
-      'id': '9',
-      'title': 'New Shoes',
-      'amount': 69.99,
-      'date': DateTime.now(),
-    },
-    {
-      'id': '10',
-      'title': 'Weekly Groceries',
-      'amount': 16.53,
-      'date': DateTime.now(),
-    },
-    {
-      'id': '11',
-      'title': 'New Shoes',
-      'amount': 69.99,
-      'date': DateTime.now(),
-    },
-    {
-      'id': '12',
-      'title': 'Weekly Groceries',
-      'amount': 16.53,
-      'date': DateTime.now(),
-    },
-    {
-      'id': '13',
-      'title': 'New Shoes',
-      'amount': 69.99,
-      'date': DateTime.now(),
-    },
-    {
-      'id': '14',
-      'title': 'Weekly Groceries',
-      'amount': 16.53,
-      'date': DateTime.now(),
-    }
-  ];
-  double totalExpenses = 0.0;
-  void loopAndSet() {
-    setState(() {
-      totalExpenses = 0; // Reset total before calculating
-      for (Map<String, dynamic> expense in expenses) {
-        totalExpenses += expense['amount'];
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    loopAndSet();
+    final expenses = useState([
+      {
+        'id': '1',
+        'title': 'New Shoes',
+        'amount': 69.99,
+        'date': DateTime.now(),
+      },
+      {
+        'id': '2',
+        'title': 'Weekly Groceries',
+        'amount': 16.53,
+        'date': DateTime.now(),
+      },
+      {
+        'id': '3',
+        'title': 'Weekly Groceries',
+        'amount': 16.53,
+        'date': DateTime.now(),
+      },
+      {
+        'id': '4',
+        'title': 'Weekly Groceries',
+        'amount': 16.53,
+        'date': DateTime.now(),
+      },
+      {
+        'id': '5',
+        'title': 'Weekly Groceries',
+        'amount': 16.53,
+        'date': DateTime.now(),
+      },
+      {
+        'id': '6',
+        'title': 'Weekly Groceries',
+        'amount': 16.53,
+        'date': DateTime.now(),
+      },
+
+      // Add more expenses as needed
+    ]);
+
+    double totalExpenses = 0.0;
+    for (var expense in expenses.value) {
+      totalExpenses += expense['amount'] as num;
+    }
+
+    void deleteExpense(int index) {
+      if (index >= 0 && index < expenses.value.length) {
+        final List<Map<String, dynamic>> updatedExpenses =
+            List.from(expenses.value);
+        updatedExpenses.removeAt(index);
+        expenses.value = List<Map<String, Object>>.from(updatedExpenses);
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Expense Tracker'),
@@ -137,7 +92,7 @@ class HomePageState extends State<HomePage> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: expenses.length,
+              itemCount: expenses.value.length,
               itemBuilder: (BuildContext context, int index) {
                 return Card(
                   child: ListTile(
@@ -146,19 +101,19 @@ class HomePageState extends State<HomePage> {
                       child: Padding(
                         padding: const EdgeInsets.all(6.0),
                         child: FittedBox(
-                          child: Text('EGP ${expenses[index]['amount']}'),
+                          child: Text('EGP ${expenses.value[index]['amount']}'),
                         ),
                       ),
                     ),
                     title: Text(
-                      expenses[index]['title'].toString(),
+                      expenses.value[index]['title'].toString(),
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     subtitle: Text(
-                      expenses[index]['date'].toString(),
+                      expenses.value[index]['date'].toString(),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -168,9 +123,7 @@ class HomePageState extends State<HomePage> {
                       icon: const Icon(Icons.delete),
                       color: Colors.red,
                       onPressed: () {
-                        setState(() {
-                          expenses.removeAt(index);
-                        });
+                        deleteExpense(index);
                       },
                     ),
                   ),
@@ -180,11 +133,82 @@ class HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color.fromRGBO(82, 170, 94, 1.0),
-        tooltip: 'Increment',
-        onPressed: () {},
-        child: const Icon(Icons.add, color: Colors.white, size: 28),
+      floatingActionButton: Builder(
+        builder: (BuildContext context) {
+          return FloatingActionButton(
+            backgroundColor: const Color.fromRGBO(82, 170, 94, 1.0),
+            tooltip: 'Increment',
+            onPressed: () async {
+              TextEditingController _titleController = TextEditingController();
+              TextEditingController _amountController = TextEditingController();
+              DateTime? selectedDate = DateTime.now();
+
+              await showMenu(
+                context: context,
+                position: RelativeRect.fromLTRB(
+                  0,
+                  0,
+                  0,
+                  MediaQuery.of(context).size.height - 100,
+                ),
+                items: [
+                  PopupMenuItem(
+                    value: 'add_expense',
+                    child: Container(
+                      width: double.infinity,
+                      child: IntrinsicWidth(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text("Add Expense"),
+                            SizedBox(height: 8),
+                            TextField(
+                              controller: _titleController,
+                              decoration: InputDecoration(
+                                hintText: 'Expense Title',
+                              ),
+                            ),
+                            TextField(
+                              controller: _amountController,
+                              decoration: InputDecoration(
+                                hintText: 'Expense Amount',
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                final DateTime? pickedDate =
+                                    await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(2015, 8),
+                                  lastDate: DateTime(2101),
+                                );
+                                selectedDate = pickedDate;
+                                print(selectedDate);
+                              },
+                              child: Text(
+                                selectedDate != null
+                                    ? 'Selected Date: ${selectedDate.toString()}'
+                                    : 'Select Date',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ).then(
+                (value) {
+                  if (value == 'add_expense') {
+                    print('Add Expense');
+                  }
+                },
+              );
+            },
+            child: const Icon(Icons.add, color: Colors.white, size: 28),
+          );
+        },
       ),
     );
   }
