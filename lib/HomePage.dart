@@ -48,8 +48,6 @@ class HomePage extends HookWidget {
         'amount': 16.53,
         'date': DateTime.now(),
       },
-
-      // Add more expenses as needed
     ]);
 
     double totalExpenses = 0.0;
@@ -64,6 +62,19 @@ class HomePage extends HookWidget {
         updatedExpenses.removeAt(index);
         expenses.value = List<Map<String, Object>>.from(updatedExpenses);
       }
+    }
+
+    void addExpense(String title, double amount, DateTime date) {
+      final List<Map<String, dynamic>> updatedExpenses =
+          List.from(expenses.value);
+      final newExpense = {
+        'id': '${expenses.value.length + 1}',
+        'title': title,
+        'amount': amount,
+        'date': date,
+      };
+      updatedExpenses.add(newExpense);
+      expenses.value = List<Map<String, Object>>.from(updatedExpenses);
     }
 
     return Scaffold(
@@ -191,6 +202,27 @@ class HomePage extends HookWidget {
                                     ? 'Selected Date: ${selectedDate.toString()}'
                                     : 'Select Date',
                               ),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                if (_titleController.text.isNotEmpty &&
+                                    _amountController.text.isNotEmpty &&
+                                    selectedDate != null) {
+                                  addExpense(
+                                    _titleController.text,
+                                    double.parse(_amountController.text),
+                                    selectedDate!,
+                                  );
+                                  _titleController.clear();
+                                  _amountController.clear();
+                                  selectedDate = DateTime.now();
+                                  print('Expense added');
+                                  Navigator.pop(context);
+                                } else {
+                                  print('All fields are required');
+                                }
+                              },
+                              child: Text("Submit"),
                             ),
                           ],
                         ),
