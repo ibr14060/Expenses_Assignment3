@@ -141,87 +141,77 @@ class HomePage extends HookWidget {
               TextEditingController _amountController = TextEditingController();
               DateTime? selectedDate = DateTime.now();
 
-              await showMenu(
+              await showModalBottomSheet(
                 context: context,
-                position: RelativeRect.fromLTRB(
-                  0,
-                  50,
-                  0,
-                  50,
-                ),
-                items: [
-                  PopupMenuItem(
-                    value: 'add_expense',
+                isScrollControlled:
+                    true, // Ensure the bottom sheet occupies full height
+                builder: (BuildContext context) {
+                  return SingleChildScrollView(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
                     child: Container(
-                      width: double.infinity,
-                      child: IntrinsicWidth(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text("Add Expense"),
-                            SizedBox(height: 8),
-                            TextField(
-                              controller: _titleController,
-                              decoration: InputDecoration(
-                                hintText: 'Expense Title',
-                              ),
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text("Add Expense", style: TextStyle(fontSize: 20)),
+                          SizedBox(height: 8),
+                          TextField(
+                            controller: _titleController,
+                            decoration: InputDecoration(
+                              hintText: 'Expense Title',
                             ),
-                            TextField(
-                              controller: _amountController,
-                              decoration: InputDecoration(
-                                hintText: 'Expense Amount',
-                              ),
+                          ),
+                          TextField(
+                            controller: _amountController,
+                            decoration: InputDecoration(
+                              hintText: 'Expense Amount',
                             ),
-                            TextButton(
-                              onPressed: () async {
-                                final DateTime? pickedDate =
-                                    await showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(2015, 8),
-                                  lastDate: DateTime(2101),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              final DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(2015, 8),
+                                lastDate: DateTime(2101),
+                              );
+                              selectedDate = pickedDate;
+                              print(selectedDate);
+                            },
+                            child: Text(
+                              selectedDate != null
+                                  ? 'Selected Date: ${selectedDate.toString()}'
+                                  : 'Select Date',
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              if (_titleController.text.isNotEmpty &&
+                                  _amountController.text.isNotEmpty &&
+                                  selectedDate != null) {
+                                addExpense(
+                                  _titleController.text,
+                                  double.parse(_amountController.text),
+                                  selectedDate!,
                                 );
-                                selectedDate = pickedDate;
-                                print(selectedDate);
-                              },
-                              child: Text(
-                                selectedDate != null
-                                    ? 'Selected Date: ${selectedDate.toString()}'
-                                    : 'Select Date',
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () async {
-                                if (_titleController.text.isNotEmpty &&
-                                    _amountController.text.isNotEmpty &&
-                                    selectedDate != null) {
-                                  addExpense(
-                                    _titleController.text,
-                                    double.parse(_amountController.text),
-                                    selectedDate!,
-                                  );
-                                  _titleController.clear();
-                                  _amountController.clear();
-                                  selectedDate = DateTime.now();
-                                  print('Expense added');
-                                  Navigator.pop(context);
-                                } else {
-                                  print('All fields are required');
-                                }
-                              },
-                              child: Text("Submit"),
-                            ),
-                          ],
-                        ),
+                                _titleController.clear();
+                                _amountController.clear();
+                                selectedDate = DateTime.now();
+                                print('Expense added');
+                                Navigator.pop(context);
+                              } else {
+                                print('All fields are required');
+                              }
+                            },
+                            child: Text("Submit"),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ],
-              ).then(
-                (value) {
-                  if (value == 'add_expense') {
-                    print('Add Expense');
-                  }
+                  );
                 },
               );
             },
