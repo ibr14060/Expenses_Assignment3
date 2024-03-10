@@ -67,9 +67,94 @@ class HomePage extends HookWidget {
 
     return Scaffold(
       appBar: AppBar(
-          title: const Text('Expense Tracker'),
-          centerTitle: true,
-          backgroundColor: const Color.fromARGB(255, 66, 191, 196)),
+        title: const Text('Expense Tracker'),
+        centerTitle: true,
+        backgroundColor: const Color.fromARGB(255, 66, 191, 196),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () async {
+              TextEditingController _titleController = TextEditingController();
+              TextEditingController _amountController = TextEditingController();
+              DateTime? selectedDate = DateTime.now();
+
+              await showModalBottomSheet(
+                context: context,
+                isScrollControlled:
+                    true, // Ensure the bottom sheet occupies full height
+                builder: (BuildContext context) {
+                  return SingleChildScrollView(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: Container(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text("Add Expense", style: TextStyle(fontSize: 20)),
+                          SizedBox(height: 8),
+                          TextField(
+                            controller: _titleController,
+                            decoration: InputDecoration(
+                              hintText: 'Expense Title',
+                            ),
+                          ),
+                          TextField(
+                            controller: _amountController,
+                            decoration: InputDecoration(
+                              hintText: 'Expense Amount',
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              final DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(2015, 8),
+                                lastDate: DateTime(2101),
+                              );
+                              selectedDate = pickedDate;
+                              print(selectedDate);
+                            },
+                            child: Text(
+                              selectedDate != null
+                                  ? 'Selected Date: ${selectedDate.toString()}'
+                                  : 'Select Date',
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              if (_titleController.text.isNotEmpty &&
+                                  _amountController.text.isNotEmpty &&
+                                  selectedDate != null) {
+                                addExpense(
+                                  _titleController.text,
+                                  double.parse(_amountController.text),
+                                  selectedDate!,
+                                );
+                                _titleController.clear();
+                                _amountController.clear();
+                                selectedDate = DateTime.now();
+                                print('Expense added');
+                                Navigator.pop(context);
+                              } else {
+                                print('All fields are required');
+                              }
+                            },
+                            child: Text("Submit"),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: <Widget>[
           Container(
