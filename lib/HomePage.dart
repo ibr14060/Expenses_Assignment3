@@ -1,13 +1,83 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:http/http.dart' as http;
 
-class HomePage extends HookWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.title, required this.username})
       : super(key: key);
 
   final String title;
   final String username;
+  @override
+  State<HomePage> createState() => HomePageState();
+}
+
+class HomePageState extends State<HomePage> {
+  List<Map<String, dynamic>> ExpensesData = [];
+  TextEditingController _titleController = TextEditingController();
+  TextEditingController _amountController = TextEditingController();
+  DateTime? selectedDate = DateTime.now();
+  void initState() {
+    super.initState();
+    fetchExpensess(); // Fetch posts when the page is initialized
+  }
+
+  Future<void> fetchExpensess() async {
+    try {
+      final response = await http.get(Uri.parse(
+          'https://expenses-assignment-default-rtdb.firebaseio.com/Expenses.json'));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+//
+
+//
+        // Clear existing post data
+        ExpensesData.clear();
+
+        jsonData.forEach((key, value) {
+          final Map<String, dynamic> expense = {
+            'id': key,
+            'title': value['title'],
+            'amount': value['amount'],
+            'date': value['date'],
+          };
+
+          ExpensesData.add(expense);
+        });
+        // var responseData = json.decode(response.body);
+        // var username = responseData['name'];
+
+        setState(() {});
+      } else {
+        print('Failed to fetch posts: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching posts: $error');
+    }
+  }
+
+  Future<void> expenseData() async {
+    var url = Uri.parse(
+        'https://expenses-assignment-default-rtdb.firebaseio.com/Expenses.json'); // Replace with your API endpoint
+    var response = await http.post(url,
+        body: json.encode({
+          'title': _titleController.text,
+          'amount': double.parse(_amountController.text),
+          'date': selectedDate.toString(),
+        }));
+
+    if (response.statusCode == 200) {
+      // Request successful
+      print('POST request successful');
+      print(response.body);
+    } else {
+      // Request failed
+      print('POST request failed with status: ${response.statusCode}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
