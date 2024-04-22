@@ -74,8 +74,22 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  void deleteExpense(int index) {
-    // Implement deletion logic here
+  Future<void> deleteExpense(String id) async {
+    try {
+      final response = await http.delete(
+        Uri.parse(
+            'https://expenses-assignment-default-rtdb.firebaseio.com/Expenses/$id.json'),
+      );
+
+      if (response.statusCode == 200) {
+        print('Expense deleted successfully');
+        fetchExpenses(); // Refresh expenses after deleting one
+      } else {
+        print('Failed to delete expense: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error deleting expense: $error');
+    }
   }
 
   @override
@@ -226,7 +240,7 @@ class HomePageState extends State<HomePage> {
                       icon: const Icon(Icons.delete),
                       color: Colors.red,
                       onPressed: () {
-                        deleteExpense(index);
+                        deleteExpense(expensesData[index]['id']);
                       },
                     ),
                   ),
