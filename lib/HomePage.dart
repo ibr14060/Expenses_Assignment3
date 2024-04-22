@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
@@ -10,129 +9,80 @@ class HomePage extends StatefulWidget {
 
   final String title;
   final String username;
+
   @override
   State<HomePage> createState() => HomePageState();
 }
 
 class HomePageState extends State<HomePage> {
-  List<Map<String, dynamic>> ExpensesData = [];
+  List<Map<String, dynamic>> expensesData = [];
   TextEditingController _titleController = TextEditingController();
   TextEditingController _amountController = TextEditingController();
   DateTime? selectedDate = DateTime.now();
+
+  @override
   void initState() {
     super.initState();
-    fetchExpensess(); // Fetch posts when the page is initialized
+    fetchExpenses(); // Fetch expenses when the page is initialized
   }
 
-  Future<void> fetchExpensess() async {
+  Future<void> fetchExpenses() async {
     try {
       final response = await http.get(Uri.parse(
           'https://expenses-assignment-default-rtdb.firebaseio.com/Expenses.json'));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
-//
-
-//
-        // Clear existing post data
-        ExpensesData.clear();
-
+        expensesData.clear();
         jsonData.forEach((key, value) {
-          final Map<String, dynamic> expense = {
+          expensesData.add({
             'id': key,
             'title': value['title'],
             'amount': value['amount'],
             'date': value['date'],
-          };
-
-          ExpensesData.add(expense);
+          });
         });
-        // var responseData = json.decode(response.body);
-        // var username = responseData['name'];
-
         setState(() {});
       } else {
-        print('Failed to fetch posts: ${response.statusCode}');
+        print('Failed to fetch expenses: ${response.statusCode}');
       }
     } catch (error) {
-      print('Error fetching posts: $error');
+      print('Error fetching expenses: $error');
     }
   }
 
-  Future<void> expenseData() async {
-    var url = Uri.parse(
-        'https://expenses-assignment-default-rtdb.firebaseio.com/Expenses.json'); // Replace with your API endpoint
-    var response = await http.post(url,
+  Future<void> addExpense(String title, double amount, DateTime date) async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+            'https://expenses-assignment-default-rtdb.firebaseio.com/Expenses.json'),
         body: json.encode({
-          'title': _titleController.text,
-          'amount': double.parse(_amountController.text),
-          'date': selectedDate.toString(),
-        }));
+          'title': title,
+          'amount': amount,
+          'date': date.toIso8601String(),
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      // Request successful
-      print('POST request successful');
-      print(response.body);
-    } else {
-      // Request failed
-      print('POST request failed with status: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        print('Expense added successfully');
+        fetchExpenses(); // Refresh expenses after adding a new one
+      } else {
+        print('Failed to add expense: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error adding expense: $error');
     }
+  }
+
+  void deleteExpense(int index) {
+    // Implement deletion logic here
   }
 
   @override
   Widget build(BuildContext context) {
-    final expenses = useState([
-      {
-        'id': '1',
-        'title': 'New Shoes',
-        'amount': 69.99,
-        'date': DateTime.now(),
-      },
-      {
-        'id': '2',
-        'title': 'Weekly Groceries',
-        'amount': 0.53,
-        'date': DateTime.now(),
-      },
-      {
-        'id': '3',
-        'title': 'Makeup',
-        'amount': 16.53,
-        'date': DateTime.now(),
-      },
-      {
-        'id': '4',
-        'title': 'Weekly shopping',
-        'amount': 160.00,
-        'date': DateTime.now(),
-      },
-    ]);
-
     double totalExpenses = 0.0;
-    for (var expense in expenses.value) {
+    for (var expense in expensesData) {
       totalExpenses += expense['amount'] as num;
-    }
-
-    void deleteExpense(int index) {
-      if (index >= 0 && index < expenses.value.length) {
-        final List<Map<String, dynamic>> updatedExpenses =
-            List.from(expenses.value);
-        updatedExpenses.removeAt(index);
-        expenses.value = List<Map<String, Object>>.from(updatedExpenses);
-      }
-    }
-
-    void addExpense(String title, double amount, DateTime date) {
-      final List<Map<String, dynamic>> updatedExpenses =
-          List.from(expenses.value);
-      final newExpense = {
-        'id': '${expenses.value.length + 1}',
-        'title': title,
-        'amount': amount,
-        'date': date,
-      };
-      updatedExpenses.add(newExpense);
-      expenses.value = List<Map<String, Object>>.from(updatedExpenses);
     }
 
     return Scaffold(
@@ -245,7 +195,7 @@ class HomePageState extends State<HomePage> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: expenses.value.length,
+              itemCount: expensesData.length,
               itemBuilder: (BuildContext context, int index) {
                 return Card(
                   child: ListTile(
@@ -254,19 +204,19 @@ class HomePageState extends State<HomePage> {
                       child: Padding(
                         padding: const EdgeInsets.all(6.0),
                         child: FittedBox(
-                          child: Text('EGP ${expenses.value[index]['amount']}'),
+                          child: Text('EGP ${expensesData[index]['amount']}'),
                         ),
                       ),
                     ),
                     title: Text(
-                      expenses.value[index]['title'].toString(),
+                      expensesData[index]['title'].toString(),
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     subtitle: Text(
-                      expenses.value[index]['date'].toString(),
+                      expensesData[index]['date'].toString(),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
