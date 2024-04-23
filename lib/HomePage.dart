@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'ExpenseProvider.dart'; // Import your ExpenseProvider
+import 'ExpenseProvider.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key, required this.title, required this.username})
@@ -26,8 +26,7 @@ class HomePage extends StatelessWidget {
 
               await showModalBottomSheet(
                 context: context,
-                isScrollControlled:
-                    true, // Ensure the bottom sheet occupies full height
+                isScrollControlled: true,
                 builder: (BuildContext context) {
                   return SingleChildScrollView(
                     padding: EdgeInsets.only(

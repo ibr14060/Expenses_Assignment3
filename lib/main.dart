@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // Import Provider
-import 'HomePage.dart'; // Assuming ExpenseProvider is defined in HomePage.dart
+import 'package:provider/provider.dart';
+import 'HomePage.dart';
 import './FirstPage.dart';
-import './ExpenseProvider.dart'; // Import ExpenseProvider
+import './ExpenseProvider.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,14 +12,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) =>
-          ExpenseProvider(), // Provide an instance of ExpenseProvider
+      create: (_) => ExpenseProvider(),
       child: MaterialApp(
         title: 'Flutter Login App',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        // home: LoginScreenapp(),
         initialRoute: '/',
         routes: {
           '/': (context) => FirstPage(),
