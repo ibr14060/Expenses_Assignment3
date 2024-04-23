@@ -19,14 +19,15 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        //  home: LoginScreenapp(),
+        // home: LoginScreenapp(),
         initialRoute: '/',
         routes: {
-          '/': (dummyCtx) => FirstPage(),
-          '/Home': (dummyCtx) => HomePage(
+          '/': (context) => FirstPage(),
+          '/Home': (context) => HomePage(
                 title: 'Home Page',
-                username: '_usernameController',
-              )
+                username:
+                    '_usernameController', // Make sure to pass correct username value
+              ),
         },
       ),
     );

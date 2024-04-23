@@ -5,17 +5,24 @@ import 'dart:convert';
 class ExpenseProvider extends ChangeNotifier {
   List<Map<String, dynamic>> _expensesData = [];
 
-  // Getter for accessing expenses data
   List<Map<String, dynamic>> get expensesData => _expensesData;
 
-  // Method to fetch expenses from a remote server
   Future<void> fetchExpenses() async {
     try {
-      final response = await http.get(Uri.parse('YOUR_API_ENDPOINT_HERE'));
+      final response = await http.get(Uri.parse(
+          'https://expenses-assignment-default-rtdb.firebaseio.com/Expenses.json'));
 
       if (response.statusCode == 200) {
-        final List<dynamic> jsonData = json.decode(response.body);
-        _expensesData = jsonData.cast<Map<String, dynamic>>();
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        _expensesData.clear();
+        jsonData.forEach((key, value) {
+          _expensesData.add({
+            'id': key,
+            'title': value['title'],
+            'amount': value['amount'],
+            'date': value['date'],
+          });
+        });
         notifyListeners();
       } else {
         print('Failed to fetch expenses: ${response.statusCode}');
@@ -28,20 +35,40 @@ class ExpenseProvider extends ChangeNotifier {
   // Method to add a new expense
   Future<void> addExpense(String title, double amount, DateTime date) async {
     try {
-      // Implement logic to add expense to the remote server
-      // Update the local data if successful
-      notifyListeners();
+      final response = await http.post(
+        Uri.parse(
+            'https://expenses-assignment-default-rtdb.firebaseio.com/Expenses.json'),
+        body: json.encode({
+          'title': title,
+          'amount': amount,
+          'date': date.toIso8601String(),
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Expense added successfully');
+        fetchExpenses(); // Refresh expenses after adding a new one
+      } else {
+        print('Failed to add expense: ${response.statusCode}');
+      }
     } catch (error) {
       print('Error adding expense: $error');
     }
   }
 
-  // Method to delete an existing expense
   Future<void> deleteExpense(String id) async {
     try {
-      // Implement logic to delete expense from the remote server
-      // Update the local data if successful
-      notifyListeners();
+      final response = await http.delete(
+        Uri.parse(
+            'https://expenses-assignment-default-rtdb.firebaseio.com/Expenses/$id.json'),
+      );
+
+      if (response.statusCode == 200) {
+        print('Expense deleted successfully');
+        fetchExpenses();
+      } else {
+        print('Failed to delete expense: ${response.statusCode}');
+      }
     } catch (error) {
       print('Error deleting expense: $error');
     }
